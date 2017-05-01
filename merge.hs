@@ -3,32 +3,40 @@ import System.Random (newStdGen, randomRs)
 import Control.Arrow ((***))
 import Data.List (partition, insert)
 
+divConq :: ((c,c) -> d) -> (b -> c) -> (a -> (b,b)) -> a -> d
+divConq combiner process divider = combiner . (process *** process) . divider
+
 merge :: Ord a => ([a],[a]) -> [a]
-merge (x:xs,y:ys) = if x < y then x:merge (xs,y:ys) else y:merge (x:xs,ys)
+merge (x:xs,y:ys) = if x <= y then x:merge (xs,y:ys) else y:merge (x:xs,ys)
 merge ([],ys) = ys
 merge (xs,[]) = xs
 
 split :: [a] -> ([a],[a])
-split xs = splitAt a xs
-  where a = length xs `div` 2
+split xs = splitAt (length xs `div` 2) xs
 
 mergeSort :: Ord a => [a] -> [a]
-mergeSort xs | length xs >= 2 = merge . (mergeSort *** mergeSort) $ split xs
-             | otherwise      = xs
+mergeSort [] = []
+mergeSort [x] = [x]
+mergeSort xs = divConq merge mergeSort split xs
 
 quickSort :: Ord a => [a] -> [a]
-quickSort [] = [];
-quickSort (x:xs) = foo . (quickSort *** quickSort) $ partition (<= x) xs
-  where
-    foo (a,b) = a ++ [x] ++ b
+quickSort [] = []
+quickSort [x] = [x]
+quickSort (x:xs) = divConq (\(a,b)-> a ++ x:b) quickSort (partition (<= x)) xs
 
 bubble :: Ord a => [a] -> [a]
-bubble (a:b:xs) = if a < b then a:bubble (b:xs) else b:bubble (a:xs)
+bubble (a:b:xs) = if a <= b then a:bubble (b:xs) else b:bubble (a:xs)
 bubble xs = xs
 
+onInits :: ([a] -> [a]) -> [a] -> [a]
+onInits f _xs = onInits' _xs []
+  where
+    onInits' [] ys = ys
+    onInits' xs ys = onInits' (init xs') (last xs' : ys)
+      where xs' = f xs
+
 bubbleSort :: Ord a => [a] -> [a]
-bubbleSort xs | length xs >= 2 = (\ys-> (bubbleSort . init) ys ++ [last ys]) $ bubble xs
-              | otherwise      = xs
+bubbleSort = onInits bubble
 
 insertionSort :: Ord a => [a] -> [a]
 insertionSort = foldr insert []
