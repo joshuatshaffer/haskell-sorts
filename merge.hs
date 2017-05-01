@@ -22,8 +22,11 @@ mergeSort xs = divConq merge mergeSort split xs
 mergeSort2 :: Ord a => [a] -> [a]
 mergeSort2 = concat . mergeSort2' . map (:[])
   where
-    mergeSort2' (a:b:xs) = mergeSort2' $ merge (a,b) : mergeSort2' xs
-    mergeSort2' xs = xs
+    mergePairs (a:b:xs) =  merge (a,b) : mergePairs xs
+    mergePairs xs = xs
+    mergeSort2' [] = []
+    mergeSort2' [x] = [x]
+    mergeSort2' xs = mergeSort2' $ mergePairs xs
 
 quickSort :: Ord a => [a] -> [a]
 quickSort [] = []
