@@ -1,5 +1,12 @@
 
-import System.Random (newStdGen, randomRs)
+module Sorts
+    (mergeSort
+    ,mergeSort2
+    ,quickSort
+    ,bubbleSort
+    ,insertionSort
+    ) where
+
 import Control.Arrow ((***))
 import Data.List (partition, insert)
 
@@ -49,14 +56,3 @@ bubbleSort = onInits bubble
 
 insertionSort :: Ord a => [a] -> [a]
 insertionSort = foldr insert []
-
-main :: IO ()
-main = do
-  g <- newStdGen
-  let xs = take 100 $ randomRs (0, 100) g :: [Int]
-  print xs
-  print $ bubbleSort xs
-  print $ insertionSort xs
-  print $ mergeSort xs
-  print $ mergeSort2 xs
-  print $ quickSort xs
