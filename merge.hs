@@ -19,6 +19,12 @@ mergeSort [] = []
 mergeSort [x] = [x]
 mergeSort xs = divConq merge mergeSort split xs
 
+mergeSort2 :: Ord a => [a] -> [a]
+mergeSort2 = concat . mergeSort2' . map (:[])
+  where
+    mergeSort2' (a:b:xs) = mergeSort2' $ merge (a,b) : mergeSort2' xs
+    mergeSort2' xs = xs
+
 quickSort :: Ord a => [a] -> [a]
 quickSort [] = []
 quickSort [x] = [x]
@@ -49,4 +55,5 @@ main = do
   print $ bubbleSort xs
   print $ insertionSort xs
   print $ mergeSort xs
+  print $ mergeSort2 xs
   print $ quickSort xs
